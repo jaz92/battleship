@@ -7,7 +7,6 @@ from enum import Enum
 
 GRID = \
 """
-
 {0}
 ____________________________
 
