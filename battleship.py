@@ -27,7 +27,7 @@ ____________________________
 
 LETTERS = 'ABCDEFGHIJ'
 
-# ai plays with itself
+# ai plays (as player) with ai
 PLAYER_AI = False
 
 
