@@ -1,8 +1,47 @@
 # Battleship
 # Author: Jan Zalewski
 
+
 import random, time, sys
 from enum import Enum
+
+
+##### Additional options #####
+
+# ai plays as player
+PLAYER_AI = False
+
+# total susspension time in seconds
+SUSP_TIME = 2
+
+# ai's "make turn" time in seconds
+TURN_TIME = 1
+
+# define game language ('en', 'pl')
+LANGUAGE = 'en'
+
+# # # # # # # # # # # # # # # # #
+
+
+# In game texts in two languages (english, polish)
+TEXTS = \
+{
+    ('your ships', 'en'): 'Your ships', ('your ships', 'pl'): 'Twoje statki', \
+    ('enemy ships', 'en'): 'Enemy ships', ('enemy ships', 'pl'): 'Statki przeciwnika', \
+    ('who starts', 'en'): 'Choosing who starts first', ('who starts', 'pl'): 'Losowanie zaczynającego pierwszą turę', \
+    ('player starts', 'en'): 'Player starts', ('player starts', 'pl'): 'Gracz zaczyna', \
+    ('enemy starts', 'en'): 'Enemy starts', ('enemy starts', 'pl'): 'Przeciwnik zaczyna', \
+    ('your turn', 'en'): 'Your turn', ('your turn', 'pl'): 'Twoja tura', \
+    ('enemy turn', 'en'): 'Enemy turn', ('enemy turn', 'pl'): 'Tura przeciwnika', \
+    ('player ai', 'en'): 'Player AI', ('player ai', 'pl'): 'AI gracza', \
+    ('missed', 'en'): 'Missed.', ('missed', 'pl'): 'Pudło.', \
+    ('hit', 'en'): 'Hit!', ('hit', 'pl'): 'Trafiony!', \
+    ('destroyed', 'en'): 'Destroyed!', ('destroyed', 'pl'): 'Trafiony zatopiony!', \
+    ('win', 'en'): 'You win!', ('win', 'pl'): 'Wygrałeś!', \
+    ('loose', 'en'): 'You loose!', ('loose', 'pl'): 'Przegrałeś!', \
+    ('play again', 'en'): 'Do you want to play again? (Y/N)?', ('play again', 'pl'): 'Chcesz zagrać jeszcze raz (T/N)?', \
+    ('thanks', 'en'): 'Thanks for playing!', ('thanks', 'pl'): 'Dzięki za grę!'
+}
 
 
 GRID = \
@@ -25,14 +64,12 @@ ____________________________
 ____________________________
 """
 
-LETTERS = 'ABCDEFGHIJ'
 
-# ai plays (as player) with ai
-PLAYER_AI = False
+LETTERS = 'ABCDEFGHIJ'
 
 
 class Direction(Enum):
-    
+    """ Enum for ships direction with additional static methods. """
     NONE = 0
     HORIZONTAL = 1
     VERTICAL = 2
@@ -257,7 +294,7 @@ class Board:
         left, right = x, x
         top, bottom = y, y
 
-        # protect indexes from going out of board's bounds
+        # protect indexes from going out of board's bounds (could be done better)
         if x != 0:
             left = x - 1
         if x != 9:
@@ -497,7 +534,7 @@ def get_player_input():
           position[0].upper() not in LETTERS or \
           not position[1:].isdigit() or \
           int(position[1:]) not in range(1, 11):
-        print('Twoja tura:')
+        print(TEXTS['your turn', LANGUAGE])
         position = input()
 
     return position.upper()
@@ -506,29 +543,31 @@ def get_player_input():
 def print_report(report):
     """ Print what happend after shoot. """
     if report == Report.MISSED:
-        print('Pudło.')
+        print(TEXTS['missed', LANGUAGE])
     elif report == Report.HIT:
-        print('Trafiony!')
+        print(TEXTS['hit', LANGUAGE])
     elif report == Report.DESTROYED:
-        print('Trafiony zatopiony!')
+        print(TEXTS['destroyed', LANGUAGE])
 
 
 def suspension():
     """ Print loading animation. """
-    time.sleep(0.5)
+    dot_time = SUSP_TIME / 4
+    
+    time.sleep(dot_time)
     print('.',end='')
-    time.sleep(0.5)
+    time.sleep(dot_time)
     print('.',end='')
-    time.sleep(0.5)
+    time.sleep(dot_time)
     print('.',end='')
-    time.sleep(0.5)
+    time.sleep(dot_time)
     print()
 
 
 def player_turn(board):
     """ Player types position and shoot. """
 
-    # Repeat if report NOT_VALID
+    # Repeat if report is NOT_VALID
     report = Report.NOT_VALID
     while report == Report.NOT_VALID:
         pos = get_player_input()
@@ -536,19 +575,19 @@ def player_turn(board):
         
     suspension()
     print_report(report)
-    time.sleep(1)
+    time.sleep(TURN_TIME)
 
             
-def ai_turn(board, ai, name = 'Tura przeciwnika'):
+def ai_turn(board, ai, name = TEXTS['enemy turn', LANGUAGE]):
     """ Turn made by AI. Similar to player_turn() function. """
     print(name)
     pos = ai.get_shoot_position(board)
     suspension()
     print(pos)
-    time.sleep(1)
+    time.sleep(TURN_TIME)
     report = ai.shoot(board)
     print_report(report)
-    time.sleep(1)
+    time.sleep(TURN_TIME)
 
 
 def print_boards(board1, board2):
@@ -561,15 +600,16 @@ def game_over(player_win):
     """ It's game over but player can choose to play again. """
     
     if player_win:
-        print('Wygrałeś! ', end='')
+        print(TEXTS['win', LANGUAGE] + ' ', end='')
     else:
-        print('Przegrałeś! ', end='')
+        print(TEXTS['loose', LANGUAGE] + ' ', end='')
         
-    print('Chcesz zagrać jeszcze raz (T/N)?: ')
-    if input().upper().startswith('T'):
+    print(TEXTS['play again', LANGUAGE] + ': ')
+    yes_letter = 'Y' if LANGUAGE == 'en' else 'T'
+    if input().upper().startswith(yes_letter):
         return
     else:
-        print('Dzięki za grę!')
+        print(TEXTS['thanks', LANGUAGE])
         sys.exit()
 
 
@@ -578,12 +618,12 @@ def enemy_first():
     return random.randint(0, 1)
 
 
-
+# this loop allows to initialize new game if player wants to play again
 while True:
 
-    # new game
-    player_board = Board('Twoje statki', hidden = False)
-    enemy_board = Board('Statki przeciwnika', hidden = True)
+    # new game initialization
+    player_board = Board(TEXTS['your ships', LANGUAGE], hidden = False)
+    enemy_board = Board(TEXTS['enemy ships', LANGUAGE], hidden = True)
 
     # player is replaced by ai
     if PLAYER_AI:
@@ -595,22 +635,22 @@ while True:
     print_boards(player_board, enemy_board)
 
 
-    # determine if enemy should start turn first
-    print('Losowanie zaczynającego pierwszą turę', end='')
+    # determine if enemy or player should start turn first
+    print(TEXTS['who starts', LANGUAGE], end='')
     suspension()
     if enemy_first():
-        print('Przeciwnik zaczyna')
+        print(TEXTS['enemy starts', LANGUAGE])
         ai_turn(player_board, enemy_ai)
         print_boards(player_board, enemy_board)
     else:
-        print('Gracz zaczyna')
+        print(TEXTS['player starts', LANGUAGE])
         
 
     # main game loop
     while True:
         # player's turn - ai can be used as player
         if PLAYER_AI:
-            ai_turn(enemy_board, player_ai, 'AI gracza')
+            ai_turn(enemy_board, player_ai, TEXTS['player ai', LANGUAGE])
         else:
             player_turn(enemy_board)
 
