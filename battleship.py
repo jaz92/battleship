@@ -189,6 +189,10 @@ class Cell:
         self.__hidden = True
         self.__update()
 
+    def show(self):
+        self.__hidden = False
+        self.__update()
+
     def set_missed(self):
         self.__hidden = False
         self.__missed = True
@@ -349,6 +353,13 @@ class Board:
                 return False
 
         return True
+
+    def show_all_ships(self):
+        """ Shows all hidden ships. Used after player looses to show where were placed hidden ships. """
+        for ship in self.ships:
+            for coords in ship:
+                position = self.to_position(coords)
+                self.board[position].show()
     
     def get_ship_by_coords(self, coords):
         """ Return ship object from ship list that has given coordinates. """
@@ -654,21 +665,24 @@ while True:
         else:
             player_turn(enemy_board)
 
-        # print boards
-        print_boards(player_board, enemy_board)
-
         # check game over -> you win
         if enemy_board.are_all_ships_destroyed():
+            print_boards(player_board, enemy_board)
             game_over(player_win = True)
             break
+
+        # print boards
+        print_boards(player_board, enemy_board)
         
         # enemy turn
         ai_turn(player_board, enemy_ai)
 
-        # print boards
-        print_boards(player_board, enemy_board)
-
         # check game over -> you lose
         if player_board.are_all_ships_destroyed():
+            enemy_board.show_all_ships()
+            print_boards(player_board, enemy_board)
             game_over(player_win = False)
             break
+
+        # print boards
+        print_boards(player_board, enemy_board)
