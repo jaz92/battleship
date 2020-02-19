@@ -1,13 +1,10 @@
 # Battleship
 # Author: Jan Zalewski
 
-
 import random, time, sys
 from enum import Enum
 
-
-##### Additional options #####
-
+###### Additional options ######
 # ai plays as player
 PLAYER_AI = False
 
@@ -19,8 +16,7 @@ TURN_TIME = 1
 
 # define game language ('en', 'pl')
 LANGUAGE = 'en'
-
-# # # # # # # # # # # # # # # # #
+################################
 
 
 # In game texts in two languages (english, polish)
@@ -43,7 +39,6 @@ TEXTS = \
     ('thanks', 'en'): 'Thanks for playing!', ('thanks', 'pl'): 'Dzięki za grę!'
 }
 
-
 GRID = \
 """
 {0}
@@ -63,7 +58,6 @@ ____________________________
   10 |{A10}|{B10}|{C10}|{D10}|{E10}|{F10}|{G10}|{H10}|{I10}|{J10}|
 ____________________________
 """
-
 
 LETTERS = 'ABCDEFGHIJ'
 
