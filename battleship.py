@@ -5,13 +5,13 @@ import random, time, sys
 from enum import Enum
 
 ###### Additional options ######
-# ai plays as player
+# AI plays as player
 PLAYER_AI = False
 
-# total susspension time in seconds
+# total suspension time in seconds
 SUSP_TIME = 2
 
-# ai's "make turn" time in seconds
+# AI's turn time in seconds
 TURN_TIME = 1
 
 # define game language ('en', 'pl')
@@ -19,7 +19,7 @@ LANGUAGE = 'en'
 ################################
 
 
-# In game texts in two languages (english, polish)
+# In game texts in two languages (English, Polish)
 TEXTS = \
 {
     ('your ships', 'en'): 'Your ships', ('your ships', 'pl'): 'Twoje statki', \
@@ -222,7 +222,7 @@ class Cell:
 
 class Board:
     """ Class representing board on which ships are placed. Game have two
-        boards: one for our ships and the other for opponents ships. """
+        boards: one for player ships and the other for enemy's ships. """
     
     def __init__(self, name, hidden = False):
         # board name
@@ -238,7 +238,7 @@ class Board:
         return str(self.board)        
 
     def __get_ships_coords_board(self):
-        """ Generate and return two-dimentional list of Boolean values: True - is ship, False - empty. """
+        """ Generate and return two-dimensional list of Boolean values: True - is ship, False - empty. """
         ships_coords_board = []
         ships_coords_list = [cell.is_ship() for cell in self.board.values()]
         for i in range(0, 100, 10):
@@ -247,7 +247,7 @@ class Board:
         return ships_coords_board 
 
     def __generate_ships(self, hidden):
-        """ Used board's constructor to generate and place all ships on board in random locations.
+        """ Used by board's constructor to generate and place all ships on board in random locations.
         # Create:
         # 1 ship of size 4
         # 2 ships of size 3
@@ -401,7 +401,7 @@ class Board:
             if (x + 1, y + 1) in self.possible_moves:
                 near_moves.append((x + 1, y + 1))
 
-        # cast all elements from coords to positions
+        # cast all elements from coordinates to positions
         near_moves = [self.to_position(coords) for coords in near_moves]
 
         return near_moves  
@@ -422,7 +422,7 @@ class Board:
         return tuple(coords) 
 
     def shoot(self, position):
-        """ Shoot at position in board. Return report describing what happend. """
+        """ Shoot at position in board. Return report describing what has happened. """
         coords = self.to_coords(position)
 
         # check if shooting is possible
@@ -546,7 +546,7 @@ def get_player_input():
 
 
 def print_report(report):
-    """ Print what happend after shoot. """
+    """ Print what has happened after shoot. """
     if report == Report.MISSED:
         print(TEXTS['missed', LANGUAGE])
     elif report == Report.HIT:
@@ -596,13 +596,13 @@ def ai_turn(board, ai, name = TEXTS['enemy turn', LANGUAGE]):
 
 
 def print_boards(board1, board2):
-    """ Prints two boards using boards' print function. """
+    """ Print two boards using boards' print function. """
     board1.print()
     board2.print()
 
     
 def game_over(player_win):
-    """ It's game over but player can choose to play again. """
+    """ Print game over. Player can choose to play again. """
     
     if player_win:
         print(TEXTS['win', LANGUAGE] + ' ', end='')
@@ -630,7 +630,7 @@ while True:
     player_board = Board(TEXTS['your ships', LANGUAGE], hidden = False)
     enemy_board = Board(TEXTS['enemy ships', LANGUAGE], hidden = True)
 
-    # player is replaced by ai
+    # player is replaced by AI
     if PLAYER_AI:
         player_ai = Player_AI()
         
@@ -653,7 +653,7 @@ while True:
 
     # main game loop
     while True:
-        # player's turn - ai can be used as player
+        # player's turn - AI can be used as player
         if PLAYER_AI:
             ai_turn(enemy_board, player_ai, TEXTS['player ai', LANGUAGE])
         else:
